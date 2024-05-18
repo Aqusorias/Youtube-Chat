@@ -119,4 +119,3 @@ while True:
                 active_tasks.append(thread_pool.submit(handle_message, message))
             else:
                 print(f'WARNING: active tasks ({len(active_tasks)}) exceeds number of workers ({MAX_WORKERS}). ({len(message_queue)} messages in the queue)')
- 
