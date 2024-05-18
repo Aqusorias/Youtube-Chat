@@ -87,7 +87,7 @@ while True:
     active_tasks = [t for t in active_tasks if not t.done()]
 
     # Check for new messages
-    new_messages = t.twitch_receive_messages();
+    new_messages = t.receive_messages();
     if new_messages:
         message_queue += new_messages; # New messages are added to the back of the queue
         message_queue = message_queue[-MAX_QUEUE_LENGTH:] # Shorten the queue to only the most recent X messages

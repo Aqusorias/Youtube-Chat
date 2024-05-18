@@ -157,7 +157,7 @@ class YouTube:
             traceback.print_exc()
         return []
 
-    def twitch_receive_messages(self):
+    def receive_messages(self):
         if self.session == None:
             self.reconnect(0)
         messages = []
