@@ -48,6 +48,7 @@ while countdown > 0:
 t = YoutubeChat.YouTube()
 t.youtube_connect(YOUTUBE_CHANNEL_ID, YOUTUBE_STREAM_URL)
 
+# Read README.md for more information about the messages / usernames.
 
 # Remember that the Username isn't lowercase and sometimes contains Emojis or f.e. JPN Characters (?).
 # If you want to do something with the Username, use for .strip() to remove the (?) and make it lowercase.
