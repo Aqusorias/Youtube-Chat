@@ -1,9 +1,12 @@
 import requests
 import re
 import time
+from colorama import Fore, init
 import json
 import concurrent.futures
 import traceback
+
+init(autoreset=True)
 
 class YouTube:
     session = None
@@ -27,9 +30,9 @@ class YouTube:
     def reconnect(self, delay):
         if self.fetch_job and self.fetch_job.running():
             if not self.fetch_job.cancel():
-                print("Waiting for fetch job to finish...")
+                print(Fore.CYAN + "Waiting for fetch job to finish...")
                 self.fetch_job.result()
-        print(f"Retrying in {delay}...")
+        print(Fore.CYAN + f"Retrying in {delay}...")
         if self.session: self.session.close()
         self.session = None
         self.config = {}
@@ -40,7 +43,7 @@ class YouTube:
         self.youtube_connect(self.channel_id, self.stream_url)
 
     def youtube_connect(self, channel_id, stream_url=None):
-        print("Connecting to YouTube...")
+        print(Fore.CYAN + "Connecting to YouTube...")
 
         self.channel_id = channel_id
         self.stream_url = stream_url
@@ -65,9 +68,9 @@ class YouTube:
             res = self.session.get(live_url)
         if not res.ok:
             if stream_url is not None:
-                print(f"Couldn't load the stream URL ({res.status_code} {res.reason}). Is the stream URL correct? {self.stream_url}")
+                print(Fore.RED + f"Couldn't load the stream URL ({res.status_code} {res.reason}). Is the stream URL correct? {self.stream_url}")
             else:
-                print(f"Couldn't load livestream page ({res.status_code} {res.reason}). Is the channel ID correct? {self.channel_id}")
+                print(Fore.RED + f"Couldn't load livestream page ({res.status_code} {res.reason}). Is the channel ID correct? {self.channel_id}")
             time.sleep(5)
             exit(1)
         livestream_page = res.text
@@ -75,7 +78,7 @@ class YouTube:
         # Find initial data in livestream page
         matches = list(self.re_initial_data.finditer(livestream_page))
         if len(matches) == 0:
-            print("Couldn't find initial data in livestream page")
+            print(Fore.RED + "Couldn't find initial data in livestream page")
             time.sleep(5)
             exit(1)
         initial_data = json.loads(matches[0].group(1))
@@ -86,14 +89,14 @@ class YouTube:
         try:
             iframe_continuation = initial_data['contents']['twoColumnWatchNextResults']['conversationBar']['liveChatRenderer']['header']['liveChatHeaderRenderer']['viewSelector']['sortFilterSubMenuRenderer']['subMenuItems'][1]['continuation']['reloadContinuationData']['continuation']
         except Exception as e:
-            print(f"Couldn't find the livestream chat. Is the channel not live? url: {live_url}")
+            print(Fore.RED + f"Couldn't find the livestream chat. Is the channel not live? url: {live_url}")
             time.sleep(5)
             exit(1)
 
         # Fetch live chat page
         res = self.session.get(f'https://youtube.com/live_chat?continuation={iframe_continuation}')
         if not res.ok:
-            print(f"Couldn't load live chat page ({res.status_code} {res.reason})")
+            print(Fore.RED + f"Couldn't load live chat page ({res.status_code} {res.reason})")
             time.sleep(5)
             exit(1)
         live_chat_page = res.text
@@ -101,7 +104,7 @@ class YouTube:
         # Find initial data in live chat page
         matches = list(self.re_initial_data.finditer(live_chat_page))
         if len(matches) == 0:
-            print("Couldn't find initial data in live chat page")
+            print(Fore.RED + "Couldn't find initial data in live chat page")
             time.sleep(5)
             exit(1)
         initial_data = json.loads(matches[0].group(1))
@@ -109,7 +112,7 @@ class YouTube:
         # Find config data
         matches = list(self.re_config.finditer(live_chat_page))
         if len(matches) == 0:
-            print("Couldn't find config data in live chat page")
+            print(Fore.RED + "Couldn't find config data in live chat page")
             time.sleep(5)
             exit(1)
         self.config = json.loads(matches[0].group(1))
@@ -123,13 +126,14 @@ class YouTube:
                 "isDocumentHidden": False
             },
         }
-        print("Connected.")
+        print(Fore.Green + "Connected.")
+        print(' ')
 
     def fetch_messages(self):
         payload_bytes = bytes(json.dumps(self.payload), "utf8")
         res = self.session.post(f"https://www.youtube.com/youtubei/v1/live_chat/get_live_chat?key={self.config['INNERTUBE_API_KEY']}&prettyPrint=false", payload_bytes)
         if not res.ok:
-            print(f"Failed to fetch messages. {res.status_code} {res.reason}")
+            print(Fore.RED + f"Failed to fetch messages. {res.status_code} {res.reason}")
             print("Body:", res.text)
             print("Payload:", payload_bytes)
             self.session.close()
@@ -152,7 +156,7 @@ class YouTube:
                                 })
             return messages
         except Exception as e:
-            print(f"Failed to parse messages.")
+            print(Fore.RED + f"Failed to parse messages.")
             print("Body:", res.text)
             traceback.print_exc()
         return []
