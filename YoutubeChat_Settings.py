@@ -17,7 +17,7 @@ YOUTUBE_CHANNEL_ID = ""
 # Normally if you have the YOUTUBE_CHANNEL_ID you could just have it as "None", but that's bugged currently.
 # So just put in the Streams URL in quotes.
 # If it's not bugged, only put in the stream Link, if you test it as a unlisted stream.
-YOUTUBE_STREAM_URL = 'https://www.youtube.com/watch?v=S1wxVGsdmcw'
+YOUTUBE_STREAM_URL = 'https://www.youtube.com/watch?v=URL'
 
 
 # The lower the message, the faster the messages are processed: it's the number of seconds it will take to handle all messages in the queue.
