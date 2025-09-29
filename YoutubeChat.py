@@ -126,7 +126,7 @@ class YouTube:
                 "isDocumentHidden": False
             },
         }
-        print(Fore.Green + "Connected.")
+        print(Fore.GREEN + "Connected.")
         print(' ')
 
     def fetch_messages(self):
